@@ -1,64 +1,60 @@
 # /firstprinciples — First-Principles Reduction Evaluator
 
-## What It Is
+## Definition
 
-A ruthlessly simple skill that forces every proposal through three questions before a single line is written or changed:
+A skill that forces proposals through three questions before writing any line.
 
-1. **Why this?** — What is the actual user need, stated without solution language?
-2. **Why not nothing?** — What breaks if this doesn't exist?
-3. **Why this way?** — Is there a simpler approach that achieves the same outcome?
+1. **Why this?** — Actual user need, devoid of solution language.
+2. **Why not nothing?** — What breaks without this?
+3. **Why this way?** — Is there a simpler path?
 
-It combines Kaplan's "assume over-engineered, cut first" with DHH's "chasing that '90s PHP high" and Jensen's "reason from first principles, then manifest the future." The result is a filter that eliminates noise before it enters the system.
-
-The goal is not to say no. The goal is to arrive at work that is load-bearing — where every piece earns its place.
+This filters noise before implementation. Goal: load-bearing work.
 
 ---
 
 ## Trigger
 
 Invoke when:
-- User says "firstprinciples", "evaluate this", "do we need this", "is this necessary"
-- Before starting any non-trivial implementation
-- During code review, architecture planning, or feature scoping
-- When a decision has multiple valid approaches and the path forward is unclear
+- User requests evaluation ("firstprinciples," "evaluate this," "is this necessary").
+- Before non-trivial implementation.
+- During review, planning, or scoping.
+- Decisions lack a clear path.
 
 ---
 
 ## Inputs
 
-- **Proposal** — a feature request, code change, architecture decision, or workflow
-- **Context** — what the system does, who uses it, what problem space it lives in
+- **Proposal** — Feature, change, architecture, or workflow.
+- **Context** — System function, users, problem space.
 
 ---
 
 ## Workflow
 
-```
-1. Receive the proposal
-2. Ask: "Why this?" — Strip all solution language. What is the actual user need?
-   - If the answer is "because everyone does it" or "for future flexibility" → flag it
-3. Ask: "Why not nothing?" — What is the actual cost of not doing this?
-   - If the answer is "nothing breaks" → question the proposal's necessity
-   - If the answer is "something breaks" → name what breaks, exactly
-4. Ask: "Why this way?" — Is there a simpler version?
-   - Compare to: doing nothing, doing it by hand, doing it with existing tools
-   - If the simplest version wasn't chosen → demand a reason
-5. Score the Three Lenses:
-   Load-Bearing?  — [Yes / Partial / No] + what would break if removed
-   Simplest Path? — [Yes / No] + what simpler alternative exists
-   Reversible?    — [Yes / No] + cost of undoing if wrong
-6. Output: The Cut → The Three Lenses → The Decision
-```
+1. Receive proposal.
+2. Ask: "Why this?" — Extract user need.
+   - Reject justification ("because everyone does it").
+3. Ask: "Why not nothing?" — Identify cost of omission.
+   - If nothing breaks, question necessity.
+   - If something breaks, name the failure mode.
+4. Ask: "Why this way?" — Assess simplicity.
+   - Compare to: do nothing, manual, existing tools.
+   - Demand justification if the simplest path is not chosen.
+5. Score Lenses:
+   Load-Bearing? — [Yes / Partial / No] + consequence of removal.
+   Simplest Path? — [Yes / No] + simpler alternative.
+   Reversible? — [Yes / No] + cost to undo.
+6. Output: The Cut → Lenses → Decision.
 
 ---
 
 ## The Three Lenses
 
-| Lens | What It Measures |
-|------|----------------|
-| **Load-Bearing** | Would something actually break if this didn't exist? Or is this a solution in search of a problem? |
-| **Simplest Path** | Is this the minimum intervention that solves the actual need? Or is there a simpler version? |
-| **Reversible** | If this decision is wrong, what's the cost to undo? Low-reversibility decisions deserve more scrutiny. |
+| Lens | Measure |
+|------|---------|
+| **Load-Bearing** | Does this cause breakage if removed? Is it a solution seeking a problem? |
+| **Simplest Path** | Is this the minimum intervention? Is there a simpler alternative? |
+| **Reversible** | Cost to undo a wrong decision. Low-reversibility demands more scrutiny. |
 
 ---
 
@@ -66,115 +62,109 @@ Invoke when:
 
 ### Why this?
 
-Reject the solution language. "We need a caching layer" is not a need — "users see 3-second delays on repeated queries" is a need.
-
+Reject solution language. "We need a caching layer" is not a need.
 A valid need statement:
-- Names a specific pain experienced by a specific user
-- States the current cost (time, money, errors, frustration)
-- Does not prescribe a solution
+- Names specific pain by a specific user.
+- States current cost (time, money, errors).
+- Prescribes no solution.
 
 Red flags:
-- "For future scalability"
+- "Future scalability"
 - "Industry standard"
 - "Best practice"
 - "We might need this later"
 
 ### Why not nothing?
 
-If you removed this thing entirely, what would actually go wrong? Be specific. "The app would work fine without it" is a valid and important answer — it means the proposal is optional.
-
-If something would genuinely break:
-- Name the specific failure mode
-- Quantify the cost if possible
-- If the cost is low, that's a signal this can be small
+If removed, what fails? Be specific. "The app works fine without it" validates omission.
+If failure occurs:
+- Name the specific failure mode.
+- Quantify cost. Low cost signals small scope.
 
 ### Why this way?
 
-The space of solutions includes:
-- Doing nothing
-- Doing it manually
-- Using an existing tool or system
-- Building something new
+Solutions include:
+- Doing nothing.
+- Manual execution.
+- Existing tools.
+- New construction.
 
-If the chosen path isn't the simplest one that solves the need, the burden of proof shifts to: *what specific property does this approach have that simpler approaches lack?*
+If the chosen path is not the simplest solution, the burden is: *What property does this approach possess that simpler options lack?*
 
 ---
 
 ## Output Format
 
 ### The Cut
-What specific elements, logic, or complexity can be removed or deferred?
+Elements, logic, or complexity to remove or defer.
 
 ### The Three Lenses
 ```
 Load-Bearing:  [Yes / Partial / No]  — explanation
-Simplest Path: [Yes / No]            — simpler alternative or why this is it
-Reversible:    [Yes / No]            — cost of undo if wrong
+Simplest Path: [Yes / No]            — alternative or justification
+Reversible:    [Yes / No]            — cost of undo
 ```
 
 ### The Decision
 ```
 ✅ Build it.  — (load-bearing, simplest path, reversible)
-⚠️ Build it smaller. — (load-bearing but over-engineered)
+⚠️ Build smaller. — (load-bearing but over-engineered)
 ❌ Don't build it. — (not load-bearing, or simplest path is doing nothing)
-🔄 Defer it. — (might be load-bearing but not now)
+🔄 Defer it. — (load-bearing but not now)
 ```
 
 ---
 
 ## Rules
 
-- **Start from skepticism.** Default posture: this proposal has optional complexity.
-- **Name the failure mode.** "Something would break" is not specific enough. What, specifically, would stop working?
-- **Prefer reversible decisions.** High-reversibility = low cost if wrong. Prefer the option that keeps doors open.
-- **"Because everyone does it" is not a reason.** Every team has different constraints. What works at Google doesn't automatically work here.
-- **Do not mistake activity for progress.** A complex solution to a simple problem is not a sign of sophistication.
-- **Simplicity is a feature.** The simplest thing that solves the actual need is almost always the right choice.
+- **Skepticism first.** Default: proposal contains optional complexity.
+- **Name failure modes.** Specify what stops the system.
+- **Prefer reversible decisions.** Low-reversibility increases risk.
+- **"Because everyone does it" is irrelevant.** Constraints differ.
+- **Activity is not progress.** Complex solutions do not equal sophistication.
+- **Simplicity is a feature.** The simplest solution solves the need.
 
 ---
 
 ## Language Rules
 
-**Avoid:** "ecosystem", "journey", "holistic", "synergy", "scalable", "robust", "enterprise", "future-proof"
+**Avoid:** "ecosystem", "journey", "holistic", "synergy", "scalable", "robust", "enterprise", "future-proof".
 
-**Use:** "workflow", "action", "button", "endpoint", "state", "user need", "failure mode", "cost", "reversible"
+**Use:** "workflow", "action", "button", "endpoint", "state", "user need", "failure mode", "cost", "reversible".
 
 ---
 
 ## When Not to Use
 
-- The proposal is already minimal and load-bearing — you'd be adding noise
-- Speed of implementation is more critical than quality right now (startup MVP phase)
-- Context is exploratory — you're brainstorming, not evaluating
-- The decision is already made and committed — firstprinciples is for live decisions, not post-hoc rationalization
+- Proposal is already minimal and load-bearing. Adding noise.
+- Speed is paramount (MVP phase).
+- Context is exploratory (brainstorming).
+- Decision is committed (firstprinciples for live decisions).
 
 ---
 
-## The Deeper Intention
+## Deeper Intention
 
-First-principles thinking is not pessimism. It's the discipline to ask whether a thing should exist before asking *how* to build it.
+First-principles thinking is not pessimism. It is the discipline to ask if a thing should exist before asking how to build it.
 
-Most complexity enters systems not through bad implementation but through unexamined assumptions: "we'll need this," "everyone does this," "what if we grow." The cost of that complexity — maintainability, cognitive load, fragility — is paid slowly over time. The cost of the question is a minute now.
+Complexity enters systems via unexamined assumptions: "we'll need this." This complexity costs maintenance and fragility. The cost of the question is minimal now.
 
-/kaplanfilter handles reduction once a thing exists. /firstprinciples handles the question of whether the thing should exist at all.
-
-Together: /firstprinciples → /kaplanfilter → /mine
+/firstprinciples handles existence. /kaplanfilter handles construction. /mine handles validation.
 
 ```
 Does this need to exist?       → firstprinciples
 Is this as simple as it can be? → kaplanfilter
-Does this sound like a human wrote it? → mine
+Does this sound like human writing? → mine
 ```
 
 ---
 
 ## Sources
 
-Extracted from Lex Fridman Podcast analysis:
-- **Jeff Kaplan** — "focus on what you wanna do, not what you wanna be"; ruthless prioritization; cutting to the single defining action
-- **DHH** — "a lot of people...compensate for that existential dread by over-complicating things"; chasing the '90s PHP high; austere precision
-- **Jensen Huang** — "I manifest a future and that future is so convincing, there's no way it won't happen"; reason from first principles; step-by-step belief shaping before execution
+- **Jeff Kaplan** — Prioritize action. Cut complexity.
+- **DHH** — Over-complication is dread. Austere precision.
+- **Jensen Huang** — Reason from first principles. Shape belief before execution.
 
 ## Dependencies
 
-None. Pure reasoning skill — no external tools required.
+None. Pure reasoning skill.
