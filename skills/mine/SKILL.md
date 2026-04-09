@@ -36,16 +36,19 @@ The goal is not perfect grammar. The goal is **soul** — the part of the writin
 1. Identify the text (file path, pasted content, or AI-generated draft)
 2. Name the originating model (e.g. "this came from Minimax M2.7")
 3. Load Gemma E2B via Ollama
-4. Send with system prompt:
+4. Call /api/chat (NOT /api/generate — generate endpoint silently
+   truncates gemma4:e2b responses at high token counts):
 
-   "You are a taste filter. Read this text and fix only the things
-   that make it sound AI-generated: typos, rhythm issues, structural
-   awkwardness, character artifacts, flat parallel structure.
-   Do NOT rewrite. Do NOT restructure arguments. Preserve the author's
-   voice — only remove the seams.
-   Return only the corrected text."
+   curl -s http://localhost:11434/api/chat -d '{
+     "model": "gemma4:e2b",
+     "messages": [
+       {"role": "system", "content": "You are a taste filter. Read this text and fix only the things that make it sound AI-generated: typos, rhythm issues, structural awkwardness, character artifacts, flat parallel structure. Do NOT rewrite. Do NOT restructure arguments. Preserve the author's voice — only remove the seams. Return only the corrected text."},
+       {"role": "user", "content": "[YOUR TEXT HERE]"}
+     ],
+     "stream": false
+   }'
 
-5. Extract Gemma's response
+5. Extract response from: .message.content in the JSON response
 6. Diff: list exactly what changed and why
 7. Present diff to user for approval
 8. On approval — save, overwrite, or suffix "_mine.md"
@@ -113,6 +116,7 @@ I learned something. Forgot it. Re-learned it. This happened so many times I sto
 - Ollama running locally
 - Gemma E2B loaded (`ollama pull gemma4:e2b` if missing)
 - Network access NOT required — this runs fully offline
+- **Important:** Use `/api/chat` endpoint — `/api/generate` silently truncates gemma4:e2b responses at high token counts
 
 ## Calibration
 
