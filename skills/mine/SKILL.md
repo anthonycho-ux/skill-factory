@@ -4,7 +4,7 @@
 
 A two-model stack that strips AI texture from generated text and reclaims the voice that is unmistakably human, unmistakably yours.
 
-**Generate** (any model) → **Polish** (Gemma E2B) → **Approve** (you)
+**Generate** (any model) → **Polish** (Gemma E4B) → **Approve** (you)
 
 The goal is not perfect grammar. The goal is **soul** — the part of writing AI cannot fabricate.
 
@@ -34,7 +34,7 @@ Invoke when:
    truncates responses at high token counts):
 
    curl -s http://localhost:11434/api/chat -d '{
-     "model": "gemma4:e2b",
+     "model": "gemma4:e4b",
      "messages": [
        {"role": "system", "content": "You are a taste filter. Read this text and fix only the things that make it sound AI-generated: typos, rhythm issues, structural awkwardness, character artifacts, flat parallel structure. Do NOT rewrite. Do NOT restructure arguments. Preserve the author'\''s voice — only remove the seams. Return only the corrected text."},
        {"role": "user", "content": "[USER TEXT]"}
@@ -93,8 +93,8 @@ Over time, Gemma learns your palate. The tool becomes an extension of your sensi
 ## Dependencies
 
 - Ollama running locally (`ollama serve`)
-- Gemma E2B loaded (`ollama pull gemma4:e2b` if missing)
-- **Critical:** Use `/api/chat` — `/api/generate` silently drops gemma4:e2b responses at high token counts
+- Gemma E4B loaded (`ollama pull gemma4:e4b` if missing)
+- **Critical:** Use `/api/chat` — `/api/generate` silently drops gemma4 responses at high token counts
 
 ---
 
